@@ -1,83 +1,96 @@
-LIB_NAME=ffmalloc
-LIB_SHARED_MT=lib${LIB_NAME}mt.so
-LIB_SHARED_ST=lib${LIB_NAME}st.so
-LIB_SHARED_INST=lib${LIB_NAME}inst.so
-LIB_SHARED_NPMT=lib${LIB_NAME}npmt.so
-LIB_SHARED_NPST=lib${LIB_NAME}npst.so
-LIB_SHARED_NPINST=lib${LIB_NAME}npinst.so
+LIB_DIR := lib
+OBJ_DIR := obj
+SRC_DIR := src
+SRCS := $(wildcard $(SRC_DIR)/*.c)
+HDRS := $(wildcard $(SRC_DIR)/*.h)
 
-LIB_OBJS_MT=ffmallocmt.o
-LIB_OBJS_ST=ffmallocst.o
-LIB_OBJS_INST=ffmallocinst.o
-LIB_OBJS_NPMT=ffmallocnpmt.o
-LIB_OBJS_NPST=ffmallocnpst.o
-LIB_OBJS_NPINST=ffmallocnpinst.o
-#LIB_SRCS=${patsubst %.o,%.c,${LIB_OBJS}}
+LIB_NAME := ffmalloc
 
-#OBJS=
-#SRCS=${patsubst %.o,%.c,${OBJS}}
+LIB_SHARED_MT := $(LIB_DIR)/lib$(LIB_NAME)mt.so
+LIB_SHARED_ST := $(LIB_DIR)/lib$(LIB_NAME)st.so
+LIB_SHARED_INST := $(LIB_DIR)/lib$(LIB_NAME)inst.so
+LIB_SHARED_NPMT := $(LIB_DIR)/lib$(LIB_NAME)npmt.so
+LIB_SHARED_NPST := $(LIB_DIR)/lib$(LIB_NAME)npst.so
+LIB_SHARED_NPINST := $(LIB_DIR)/lib$(LIB_NAME)npinst.so
 
-#CFLAGS=-Wall -Wextra -fPIC -c -g -O3
-CFLAGS=-Wall -Wextra -Wno-unknown-pragmas -fPIC -c -g -O3 -DFF_GROWLARGEREALLOC -D_GNU_SOURCE
-#CFLAGS=-Wall -Wextra -fPIC -c -O3 -DFF_PROFILE
-CC=gcc
+OBJ_SHARED_MT := $(patsubst $(LIB_DIR)/%.so, $(OBJ_DIR)/%.o, $(LIB_SHARED_MT))
+OBJ_SHARED_ST := $(patsubst $(LIB_DIR)/%.so, $(OBJ_DIR)/%.o, $(LIB_SHARED_ST))
+OBJ_SHARED_INST := $(patsubst $(LIB_DIR)/%.so, $(OBJ_DIR)/%.o, $(LIB_SHARED_INST))
+OBJ_SHARED_NPMT := $(patsubst $(LIB_DIR)/%.so, $(OBJ_DIR)/%.o, $(LIB_SHARED_NPMT))
+OBJ_SHARED_NPST := $(patsubst $(LIB_DIR)/%.so, $(OBJ_DIR)/%.o, $(LIB_SHARED_NPST))
+OBJ_SHARED_NPINST := $(patsubst $(LIB_DIR)/%.so, $(OBJ_DIR)/%.o, $(LIB_SHARED_NPINST))
+
+CFLAGS := -Wall -Wextra -Wno-unknown-pragmas -fPIC -c -g -O3 -DFF_GROWLARGEREALLOC -D_GNU_SOURCE
+CC := gcc
 
 all: prefixed noprefix
+.PHONY: all
 
 prefixed: sharedmt sharedst sharedinst
+.PHONY: prefixed
 
 noprefix: sharednpmt sharednpst sharednpinst
+.PHONY: noprefix
 
-sharedmt: ${LIB_SHARED_MT}
+sharedmt: $(LIB_SHARED_MT)
+.PHONY: sharedmt
 
-sharedst: ${LIB_SHARED_ST}
+sharedst: $(LIB_SHARED_ST)
+.PHONY: sharedst
 
-sharedinst: ${LIB_SHARED_INST}
+sharedinst: $(LIB_SHARED_INST)
+.PHONY: sharedinst
 
-sharednpmt: ${LIB_SHARED_NPMT}
+sharednpmt: $(LIB_SHARED_NPMT)
+.PHONY: sharednpmt
 
-sharednpst: ${LIB_SHARED_NPST}
+sharednpst: $(LIB_SHARED_NPST)
+.PHONY: sharednpst
 
-sharednpinst: ${LIB_SHARED_NPINST}
+sharednpinst: $(LIB_SHARED_NPINST)
+.PHONY: sharednpinst
 
-${LIB_SHARED_MT}: ${LIB_OBJS_MT}
-	${CC} -o $@ -shared -fPIC -pthread $^
+$(LIB_SHARED_MT): $(OBJ_SHARED_MT) | $(LIB_DIR)
+	$(CC) -o $@ -shared -fPIC -pthread $<
 
-${LIB_SHARED_ST}: ${LIB_OBJS_ST}
-	${CC} -o $@ -shared -fPIC $^
+$(LIB_SHARED_ST): $(OBJ_SHARED_ST) | $(LIB_DIR)
+	$(CC) -o $@ -shared -fPIC $<
 
-${LIB_SHARED_INST}: ${LIB_OBJS_INST}
-	${CC} -o $@ -shared -fPIC $^
+$(LIB_SHARED_INST): $(OBJ_SHARED_INST) | $(LIB_DIR)
+	$(CC) -o $@ -shared -fPIC $<
 
-${LIB_SHARED_NPMT}: ${LIB_OBJS_NPMT}
-	${CC} -o $@ -shared -fPIC -pthread $^
+$(LIB_SHARED_NPMT): $(OBJ_SHARED_NPMT) | $(LIB_DIR)
+	$(CC) -o $@ -shared -fPIC -pthread $<
 
-${LIB_SHARED_NPST}: ${LIB_OBJS_NPST}
-	${CC} -o $@ -shared -fPIC $^
+$(LIB_SHARED_NPST): $(OBJ_SHARED_NPST) | $(LIB_DIR)
+	$(CC) -o $@ -shared -fPIC $<
 
-${LIB_SHARED_NPINST}: ${LIB_OBJS_NPINST}
-	${CC} -o $@ -shared -fPIC $^
+$(LIB_SHARED_NPINST): $(OBJ_SHARED_NPINST) | $(LIB_DIR)
+	$(CC) -o $@ -shared -fPIC $<
 
-${LIB_OBJS_MT}: ffmalloc.c
-	${CC} ${CFLAGS} -DUSE_FF_PREFIX ffmalloc.c -o $@
+$(OBJ_SHARED_MT): $(SRCS) | $(OBJ_DIR)
+	$(CC) $(CFLAGS) -DUSE_FF_PREFIX $< -o $@
 
-${LIB_OBJS_ST}: ffmalloc.c
-	${CC} ${CFLAGS} -DUSE_FF_PREFIX -DFFSINGLE_THREADED ffmalloc.c -o $@
+$(OBJ_SHARED_ST): $(SRCS) | $(OBJ_DIR)
+	$(CC) $(CFLAGS) -DUSE_FF_PREFIX -DFFSINGLE_THREADED $< -o $@
 
-${LIB_OBJS_INST}: ffmalloc.c
-	${CC} ${CFLAGS} -DUSE_FF_PREFIX -DFFSINGLE_THREADED -DFF_INSTRUMENTED ffmalloc.c -o $@
+$(OBJ_SHARED_INST): $(SRCS) | $(OBJ_DIR)
+	$(CC) $(CFLAGS) -DUSE_FF_PREFIX -DFFSINGLE_THREADED -DFF_INSTRUMENTED $< -o $@
 
-${LIB_OBJS_NPMT}: ffmalloc.c
-	${CC} ${CFLAGS} ffmalloc.c -o $@
+$(OBJ_SHARED_NPMT): $(SRCS) | $(OBJ_DIR)
+	$(CC) $(CFLAGS) $< -o $@
 
-${LIB_OBJS_NPST}: ffmalloc.c
-	${CC} ${CFLAGS} -DFFSINGLE_THREADED ffmalloc.c -o $@
+$(OBJ_SHARED_NPST): $(SRCS) | $(OBJ_DIR)
+	$(CC) $(CFLAGS) -DFFSINGLE_THREADED $< -o $@
 
-${LIB_OBJS_NPINST}: ffmalloc.c
-	${CC} ${CFLAGS} -DFFSINGLE_THREADED -DFF_INSTRUMENTED ffmalloc.c -o $@
+$(OBJ_SHARED_NPINST): $(SRCS) | $(OBJ_DIR)
+	$(CC) $(CFLAGS) -DFFSINGLE_THREADED -DFF_INSTRUMENTED $< -o $@
 
-ffmalloc.c: ffmalloc.h
+$(OBJ_DIR) $(LIB_DIR):
+	mkdir -p $@
+
+$(SRCS): $(HDRS)
 
 clean:
-	rm *.o
-	rm *.so
+	rm $(wildcard $(LIB_DIR)/*.so)
+	rm $(wildcard $(OBJ_DIR)/*.o)

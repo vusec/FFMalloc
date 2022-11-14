@@ -2583,9 +2583,10 @@ void fffree(void* ptr) {
 	if (pool == NULL) {
 		// Program is trying to free a bad pointer
 		// Or more likely there is a bug in this library
-		fprintf(stderr, "Attempt to free %p but no matching pool\n", ptr);
-		fflush(stderr);
-		abort();
+	//	fprintf(stderr, "Attempt to free %p but no matching pool\n", ptr);
+	//	fflush(stderr);
+	//	abort();
+        free(ptr);
 	}
 
 #ifdef FF_PROFILE
