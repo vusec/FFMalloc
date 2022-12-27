@@ -92,5 +92,5 @@ $(OBJ_DIR) $(LIB_DIR):
 $(SRCS): $(HDRS)
 
 clean:
-	rm $(wildcard $(LIB_DIR)/*.so)
-	rm $(wildcard $(OBJ_DIR)/*.o)
+	rm -rf $(LIB_DIR)
+	rm -rf $(OBJ_DIR)

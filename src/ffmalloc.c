@@ -32,7 +32,7 @@
 // On x86_64 allocation alignment is usually 16-byte. However, this is only
 // required to support certain SSE instructions. If those are not used then
 // alignment can be 8-byte and therefore more efficient. Pointers don't seem
-// to ever require 16-byte allignment and so 8-byte alignment will always be 
+// to ever require 16-byte allignment and so 8-byte alignment will always be
 // used for allocations of 8 bytes or less. This is backed up in practice by
 // TCMalloc. To enable 8-byte alignment, define FF_EIGHTBYTEALIGN during
 // library compilation
@@ -147,7 +147,7 @@ typedef unsigned char byte;
 // For a single threaded process, making lots of small allocations
 // from the page pool to the one-and-only thread cache is pointless
 #undef PAGES_PER_REFILL
-#define PAGES_PER_REFILL (POOL_SIZE / PAGE_SIZE) 
+#define PAGES_PER_REFILL (POOL_SIZE / PAGE_SIZE)
 
 // When single threaded, having multiple parallel large pool lists has
 // no advantage and wastes resources
@@ -169,7 +169,7 @@ typedef unsigned char byte;
 // Defines the minimum alignment
 #define MIN_ALIGNMENT 8
 
-// The number of small allocation bins in a thread cache when using 8-byte 
+// The number of small allocation bins in a thread cache when using 8-byte
 // alignment
 #define BIN_COUNT 45
 
@@ -180,9 +180,9 @@ typedef unsigned char byte;
 // Rounds requested allocation size up to the next multiple of 8
 #define ALIGN_SIZE(SIZE) ((SIZE + SEVEN64) & ~SEVEN64)
 
-// Select the bin to allocate from based on the size. Below 208 bytes, bins are 
+// Select the bin to allocate from based on the size. Below 208 bytes, bins are
 // every 8 bytes. Above 208, bins are unevenly spaced based on the maximal size
-// that divides into PAGE_SIZE for a given number of slots then rounded down to 
+// that divides into PAGE_SIZE for a given number of slots then rounded down to
 // the nearest multiple of 8
 #define GET_BIN(SIZE) (SIZE <= 208 ? BIN_COUNT - (SIZE >> 3) : PAGE_SIZE / SIZE)
 
@@ -203,8 +203,8 @@ typedef unsigned char byte;
 
 // Select the bin to allocate from based on the size. Allocations smaller than
 // eight bytes always come from the eight byte bin. Otherwise, below 304 bytes,
-// bins are every 16 bytes. Above 304, bins are unevenly spaced based on the 
-// maximal size that divides into PAGE_SIZE for a given number of slots then 
+// bins are every 16 bytes. Above 304, bins are unevenly spaced based on the
+// maximal size that divides into PAGE_SIZE for a given number of slots then
 // rounded down to the nearest multiple of 16
 #define GET_BIN(SIZE) (SIZE <= 8 ? 0 : SIZE <= 304 ? BIN_COUNT - (SIZE >> 4) : PAGE_SIZE / SIZE)
 #endif
@@ -293,7 +293,7 @@ typedef unsigned char byte;
 #define FFLOCKSTATIC(NAME) static CRITICAL_SECTION NAME;
 
 // Thread local storage key type
-#define FFTLSINDEX DWORD 
+#define FFTLSINDEX DWORD
 
 #else
 // Synchronization functions on Linux
@@ -328,7 +328,7 @@ typedef unsigned char byte;
 /*** Metadata Structures ***/
 
 // When a page allocates objects smaller than 64 bytes, interpret the
-// bitmap field in the page map as a pointer to an array of bitmaps. 
+// bitmap field in the page map as a pointer to an array of bitmaps.
 // Otherwise, the field is the bitmap
 union bitmap_t {
 	uint64_t single;
@@ -378,7 +378,7 @@ struct pagepool_t {
 
 	// The index of the next pointer in a large pool to be allocated.
 	// The pointer in this slot is not yet allocated, but it
-	// is needed so that the size of the last allocated 
+	// is needed so that the size of the last allocated
 	// pointer can still be computed
 	size_t nextFreeIndex;
 
@@ -430,7 +430,7 @@ struct threadcache_t {
 	struct bin_t bins[BIN_COUNT];
 
 	// To reduce round trips to the page pool, a small number of
-	// blank pages are assigned to the thread cache to add to a 
+	// blank pages are assigned to the thread cache to add to a
 	// bin when it gets full. This points to the next available
 	// free page
 	struct pagemap_t* nextUnusedPage;
@@ -680,7 +680,7 @@ static inline void* os_alloc_highwater(size_t size) {
 				flags, -1, 0);
 		if(result == MAP_FAILED) {
 			// If the failure was because the requested address already has
-			// a mapping associated then jump up by POOL_SIZE (since a new 
+			// a mapping associated then jump up by POOL_SIZE (since a new
 			// pool created on another thread is the most likely reason)
 			// and try again
 			if(errno == EEXIST) {
@@ -720,7 +720,7 @@ static inline int os_free(void* startAddress) {
 	}
 
 	errno = EINVAL;
-	return -1; 
+	return -1;
 }
 #endif
 
@@ -728,17 +728,17 @@ static inline int os_free(void* startAddress) {
 /*** Dynamic metadata allocation ***/
 // FFmalloc has several metadata structures that need to be dynamically allocated
 // If we restricted usage to Windows or requiring use of the ff prefix on Linux
-// then LocalAlloc or libc malloc respectively could be used. But, we'd like to 
+// then LocalAlloc or libc malloc respectively could be used. But, we'd like to
 // allow non-prefixed usage via LD_PRELOAD on Linux (or static compilation so long
 // as we're the first library). Therefore, we have a mini-allocator for metadata
 // allocations. Because this should only be used internally, it does *not*
 // implement the forward-only principal. Also note that the "free" equivalent
-// requires a size parameter. This simplifies the amount of metadata for the 
+// requires a size parameter. This simplifies the amount of metadata for the
 // metadata stored
 
 static void* ffpoolmetadata_alloc(int isSmallPool) {
 	byte* allocation;
-	size_t size = isSmallPool ? (POOL_SIZE / PAGE_SIZE) * sizeof(struct pagemap_t) : 
+	size_t size = isSmallPool ? (POOL_SIZE / PAGE_SIZE) * sizeof(struct pagemap_t) :
 		(POOL_SIZE >> 20) * PAGE_SIZE;
 	size = ALIGN_SIZE(size);
 
@@ -776,7 +776,7 @@ static void* ffpoolmetadata_alloc(int isSmallPool) {
 }
 
 static void ffpoolmetadata_free(void* ptr, int isSmallPool) {
-	size_t size = isSmallPool ? (POOL_SIZE / PAGE_SIZE) * sizeof(struct pagemap_t) : 
+	size_t size = isSmallPool ? (POOL_SIZE / PAGE_SIZE) * sizeof(struct pagemap_t) :
 		(POOL_SIZE >> 20) * PAGE_SIZE;
 	size = ALIGN_SIZE(size);
 
@@ -809,7 +809,7 @@ static void* ffmetadata_alloc(size_t size) {
 	FFEnterCriticalSection(&binLocks[binID]);
 	if (bins[binID] == NULL) {
 		// No freed chunks of this size exist. Allocate space from the top
-		// of the pool. Keeping things simple for now and not trying to 
+		// of the pool. Keeping things simple for now and not trying to
 		// break a free 64-byte chunk into 4*16-byte chunks or whatever
 		FFEnterCriticalSection(&mdPoolLock);
 		allocation = metadataFree;
@@ -902,7 +902,7 @@ void add_pool_to_tree(struct pagepool_t* pool) {
 	size_t endStemIndex = (uintptr_t)pool->end >> (POOL_SIZE_BITS + LEAF_BITS + STEM_BITS);
 	size_t endLeafIndex = ((uintptr_t)pool->end >> (POOL_SIZE_BITS + LEAF_BITS)) & (LEAVES_PER_STEM - 1);
 	size_t endPoolIndex = ((uintptr_t)pool->end >> POOL_SIZE_BITS) & (POOLS_PER_LEAF - 1);
-	
+
 	// Pool creation should be infrequent enough that trying to come up
 	// with a fancy lock-free update structure probably isn't worth it
 	FFEnterCriticalSection(&poolTreeLock);
@@ -1009,7 +1009,7 @@ void destroy_tcache(struct threadcache_t* tcache) {
 		os_decommit(tcache->nextUnusedPage->start, (tcache->endUnusedPage - tcache->nextUnusedPage) * PAGE_SIZE);
 	}
 }
-// End OS neutral multi-threaded 
+// End OS neutral multi-threaded
 #ifdef _WIN64
 // Begin Windows specific multi-threaded support
 
@@ -1071,7 +1071,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 }
 
 // Gets the thread cache associated with the current thread. On the
-// first call from a given thread, a new cache is created 
+// first call from a given thread, a new cache is created
 static inline struct threadcache_t* get_threadcache(struct arena_t* arena) {
 	struct threadcache_t* tcache = TlsGetValue(arena->tlsIndex);
 	if (tcache == NULL) {
@@ -1212,7 +1212,7 @@ static ffresult_t create_arena(struct arena_t* newArena) {
 	if(!FFTlsAlloc(newArena->tlsIndex, TLS_CLEANUP_CALLBACK)) {
 		ffmetadata_free(newArena, sizeof(struct arena_t));
 		return FFSYS_LIMIT;
-	}		
+	}
 
 	// Create the small pool list header
 	newArena->smallPoolList = (struct poollistnode_t*)ffmetadata_alloc(sizeof(struct poollistnode_t));
@@ -1249,7 +1249,7 @@ static ffresult_t create_arena(struct arena_t* newArena) {
 		pool->arena = newArena;
 		if (pool == NULL || create_largepagepool(pool) == -1) {
 			destroy_pool_list(newArena->smallPoolList);
-			// TODO: deconstruct any 
+			// TODO: deconstruct any
 			// successfully created large pools
 			ffmetadata_free(newArena, sizeof(struct arena_t));
 			return FFNOMEM;
@@ -1325,7 +1325,7 @@ static int create_largepagepool(struct pagepool_t* newPool) {
 		newPool->arena->profile.maxOSBytesMapped = newPool->arena->profile.currentOSBytesMapped;
 	}
 #endif
-	
+
 	// Add the metadata to the pool
 	newPool->tracking.allocations = (uintptr_t*)metadata;
 
@@ -1381,12 +1381,12 @@ static inline int create_jumbopool(struct pagepool_t* newPool, size_t size) {
 	}
 #endif
 
-	// Record the size of this oddball	
+	// Record the size of this oddball
 	newPool->start = (byte*)storage;
 	newPool->end = (byte*)storage + size;
 
 	// Return success
-	return 0;	
+	return 0;
 }
 
 // Initializes a new thread cache by constructing the bins
@@ -1400,7 +1400,7 @@ static void init_tcache(struct threadcache_t* tcache, struct arena_t* arena) {
 		tcache->bins[BIN_COUNT - b].allocSize = b * MIN_ALIGNMENT;
 		tcache->bins[BIN_COUNT - b].maxAlloc = PAGE_SIZE / (b * MIN_ALIGNMENT);
 
-		// Set allocCount equal to maxAlloc and not 0 even though its 
+		// Set allocCount equal to maxAlloc and not 0 even though its
 		// empty so that the first allocation from bin will actually trigger
 		// allocating a page instead of pre-emptively doing that now and
 		// wasting it on a bin that might not get used
@@ -1471,7 +1471,7 @@ static void initialize() {
 
 	// Create a large contiguous range of virtual address space but don't
 	// actually map the addresses to pages just yet
-	metadataPool = (byte*)mmap(NULL, 1024UL * 1048576UL, PROT_NONE, 
+	metadataPool = (byte*)mmap(NULL, 1024UL * 1048576UL, PROT_NONE,
 			MAP_ANONYMOUS | MAP_PRIVATE | MAP_NORESERVE, -1, 0);
 	metadataFree = metadataPool;
 	metadataEnd = metadataPool + POOL_SIZE;
@@ -1574,12 +1574,12 @@ static void destroy_arena(struct arena_t* arena) {
 		FFDeleteCriticalSection(&arena->largeListLock[i]);
 	}
 
-	// TODO: When a thread ends before the arena is destroyed, the 
+	// TODO: When a thread ends before the arena is destroyed, the
 	// appropriate OS specific handler will clean up its thread cache
 	// Here, we need to find a way to delete any thread caches for
 	// threads that haven't yet exited (but hopefully know not to
 	// allocate from this arena anymore)
-	
+
 	FFTlsFree(arena->tlsIndex);
 
 	FFDeleteCriticalSection(&arena->smallListLock);
@@ -1590,8 +1590,8 @@ static void destroy_arena(struct arena_t* arena) {
 
 /*** Search functions ***/
 
-// Helper function to find the page within a pool that a small pointer was 
-// allocated from. On success, the function will return the index within the 
+// Helper function to find the page within a pool that a small pointer was
+// allocated from. On success, the function will return the index within the
 // page where the pointer is located and pagemap will point to the pointer to
 // the pagemap. The return value will be less than 0 on failure
 static int64_t find_small_ptr(const byte* ptr, const struct pagepool_t* pool, struct pagemap_t** pageMap) {
@@ -1609,7 +1609,7 @@ static int64_t find_small_ptr(const byte* ptr, const struct pagepool_t* pool, st
 	if((ptr - page->start) % (page->allocSize & ~SEVEN64) != 0) {
 		return -2;
 	}
-	
+
 	// Is the pointer actually allocated?
 	if (page->allocSize < 64) {
 		uint64_t array = index >> 6;
@@ -1629,8 +1629,8 @@ static int64_t find_small_ptr(const byte* ptr, const struct pagepool_t* pool, st
 
 // Helper function to find the location within a large allocation pool of a
 // specific allocation. Returns the size of the allocation on success or 0 if
-// the allocation is not found. Also, if the allocation is found then the 
-// index of the allocation in the metadata array is copied to the location 
+// the allocation is not found. Also, if the allocation is found then the
+// index of the allocation in the metadata array is copied to the location
 // pointed to by metadataIndex
 static size_t find_large_ptr(const byte* ptr, struct pagepool_t* pool, size_t* metadataIndex) {
 	size_t left = 0;
@@ -1672,8 +1672,8 @@ static void* ffmalloc_small(size_t size, struct arena_t* arena) {
 	struct bin_t* bin;
 
 	// Get the correct thread cache. By allocating
-	// from a per-thread cache, we don't have to 
-	// acquire and release locks 
+	// from a per-thread cache, we don't have to
+	// acquire and release locks
 	struct threadcache_t* tcache = get_threadcache(arena);
 
 	// Select the correct bin based on size and alignment
@@ -1707,13 +1707,13 @@ static void* ffmalloc_small(size_t size, struct arena_t* arena) {
 		// If the bin holds more than 64 allocations, then point
 		// the page map to a new bitmap array
 		if (bin->maxAlloc > 64) {
-			size_t bitmapCount = (bin->maxAlloc & SIXTYTHREE64) ? 
+			size_t bitmapCount = (bin->maxAlloc & SIXTYTHREE64) ?
 				(bin->maxAlloc >> 6) + 1 : (bin->maxAlloc >> 6);
 			bin->page->bitmap.array = (uint64_t*)ffmetadata_alloc(bitmapCount * 8);
 		}
 	}
 
-	// Mark the next allocation on the page as in use on the bitmap. 
+	// Mark the next allocation on the page as in use on the bitmap.
 	// Must use atomic operations to mark the bitmap because even though this is
 	// the only cache that can allocate from here, any thread could be freeing a
 	// previous allocation
@@ -1756,11 +1756,11 @@ static inline void* ffmalloc_large_from_pool(size_t size, size_t alignment, stru
 	// Record the metadata
 	// For a standard 8 or 16 byte allignment we just record the address of
 	// the next allocation to the end of the list. This allocation was already
-	// recorded on the previous call. The reason is that size is stored 
+	// recorded on the previous call. The reason is that size is stored
 	// implicitly as the difference between consecutive pointers therefore,
 	// for N allocations we need N+1 pointers in the metadata.
 	// When the alignment is greater than 8/16, the returned pointer could
-	// be greater than what was recorded last time so we also have to 
+	// be greater than what was recorded last time so we also have to
 	// update that pointer - effectively growing the previous allocation.
 	// The alternative would be to create and immediately mark free the
 	// little spacer allocation in between but there isn't any obvious
@@ -1779,7 +1779,7 @@ static inline void* ffmalloc_large_from_pool(size_t size, size_t alignment, stru
 	}
 	pool->tracking.allocations[++pool->nextFreeIndex] = (uintptr_t)pool->nextFreePage;
 
-	// If there is less than the minimum large size allocation left, then 
+	// If there is less than the minimum large size allocation left, then
 	// change the last metadata entry so that this allocation gets the remaining
 	// space
 	if (pool->end - pool->nextFreePage < (ptrdiff_t)(HALF_PAGE + MIN_ALIGNMENT)) {
@@ -1825,7 +1825,7 @@ static inline void trim_large_pool(struct pagepool_t* pool) {
 	}
 }
 
-// Finds a suitable large pool to allocate from, or creates a new pool 
+// Finds a suitable large pool to allocate from, or creates a new pool
 // if neccessary
 static void* ffmalloc_large(size_t size, size_t alignment, struct arena_t* arena) {
 	struct poollistnode_t* node;
@@ -1922,7 +1922,7 @@ static void* ffmalloc_large(size_t size, size_t alignment, struct arena_t* arena
 	// Pool creation successful so add it to the tree for later pointer lookup
 	add_pool_to_tree(pool);
 
-	// Finally allocate the block requested 
+	// Finally allocate the block requested
 	// No need for locks here because nobody else can see this until
 	// it's added to the list
 	void* allocation = ffmalloc_large_from_pool(size, alignment, pool);
@@ -1960,7 +1960,7 @@ static void* ffmalloc_jumbo(size_t size, struct arena_t* arena) {
 		errno = ENOMEM;
 		return NULL;
 	}
-	
+
 	// Connect page to caller's arena and initialize
 	jumboPool->arena = arena;
 	if(create_jumbopool(jumboPool, size) == -1) {
@@ -2054,7 +2054,7 @@ static void free_page(struct pagepool_t* pool, struct pagemap_t* pageMap) {
 		rightIsFreed++;
 	}
 
-	// Check if the computed range of pages meets either the minimum size 
+	// Check if the computed range of pages meets either the minimum size
 	// threshold or if the range constitutes an "island" connecting two
 	// freed regions. If so, then return the pages to the OS
 	if ((endAddress - startAddress >= (ptrdiff_t)(PAGE_SIZE * MIN_PAGES_TO_FREE)) || (leftIsFreed != 0 && rightIsFreed != 0)) {
@@ -2246,7 +2246,7 @@ static void free_large_pointer(struct pagepool_t* pool, size_t index, __attrUnus
 
 	if((byte*)startFreeAddr <= pool->startInUse) {
 		if((byte*)endFreeAddr < pool->end) {
-			size_t contFreeIndex = lastFreeIndex; 
+			size_t contFreeIndex = lastFreeIndex;
 			while(contFreeIndex < pool->nextFreeIndex && ((pool->tracking.allocations[contFreeIndex + 1] & TWO64) != 0)) {
 				contFreeIndex++;
 			}
@@ -2331,7 +2331,7 @@ void* ffmalloc(size_t size) {
 	// Returning NULL when size==0 would be legal according to the man
 	// pages. This would be the preferred behavior because an allocation
 	// of zero is almost certain to turn into a call to realloc and that's
-	// expensive for this library. However, at least one of the PARSEC 
+	// expensive for this library. However, at least one of the PARSEC
 	// benchmarks won't run if we do that so begrudingly return a minimum
 	// allocation for size 0
 	if (size == 0) {
@@ -2342,7 +2342,7 @@ void* ffmalloc(size_t size) {
 	FFAtomicIncrement(arenas[0]->profile.mallocCount);
 	FFAtomicAdd(arenas[0]->profile.totalBytesRequested, size);
 #endif
-	// If size is very close to SIZE_MAX, the ALIGN_SIZE macro will 
+	// If size is very close to SIZE_MAX, the ALIGN_SIZE macro will
 	// return 0
 	if(size > SIZE_MAX - MIN_ALIGNMENT) {
 		errno = ENOMEM;
@@ -2390,7 +2390,7 @@ void* ffrealloc(void* ptr, size_t size) {
 		fffree(ptr);
 		return NULL;
 	}
-	
+
 	struct pagepool_t* pool = find_pool_for_ptr((const byte*)ptr);
 	if (pool == NULL) {
 		// Program is trying to free a bad pointer
@@ -2433,8 +2433,8 @@ void* ffrealloc(void* ptr, size_t size) {
 		// profiling the SPECint PerlBench test says that its at least
 		// occassionally very common
 
-		// Potential integer overflow issue below. Since inplace resize 
-		// is only possible if the new size would still fit within the 
+		// Potential integer overflow issue below. Since inplace resize
+		// is only possible if the new size would still fit within the
 		// pool, checking that size < POOL_SIZE should be sufficient
 		if(size < POOL_SIZE) {
 			FFEnterCriticalSection(&pool->poolLock);
@@ -2727,7 +2727,7 @@ void* ffmemalign(size_t alignment, size_t size) {
 	}
 
 	// The man page is silent on whether a minimum value for alignment is
-	// enforced (compare to posix_memalign). Since none is mentioned, 
+	// enforced (compare to posix_memalign). Since none is mentioned,
 	// allow all values but anything less than pointer size will just be
 	// handled as a regular malloc
 	if(alignment <= sizeof(void*)) {
@@ -3008,9 +3008,9 @@ ffresult_t ffmalloc_arena(ffarena_t arenaKey, void** ptr, size_t size) {
 	// Check that the arena key is in range and exists. Technically,
 	// nothing bad would happen by allowing allocation out of the default
 	// arena here. However, it would violate the spirit of the API which is
-	// that the arena key should be generated by ffcreate_arena. Second, 
+	// that the arena key should be generated by ffcreate_arena. Second,
 	// the caller should not depend on the default arena being zero since
-	// that's an internal implementation detail. Lastly, it would violate 
+	// that's an internal implementation detail. Lastly, it would violate
 	// principle of least surprise since zero definitely can't be used with
 	// ffdestroy_arena and the caller may be confused that zero can be
 	// allocated from but not destroyed
@@ -3020,7 +3020,7 @@ ffresult_t ffmalloc_arena(ffarena_t arenaKey, void** ptr, size_t size) {
 	else {
 		arena = arenas[arenaKey];
 	}
-	
+
 	// Prohibit zero byte allocations. It can't be realloc'ed to bigger
 	// than 8 anyways without a copy so just ask for what you need to start
 	// Also protect against overflow due to alignment below
@@ -3308,7 +3308,7 @@ static void print_current_usage() {
 												(pool->tracking.allocations[index] & ~SEVEN64));
 										}
 										else {
-											thisPoolInUse += (pool->tracking.allocations[index + 1] & ~SEVEN64) - pool->tracking.allocations[index];	
+											thisPoolInUse += (pool->tracking.allocations[index + 1] & ~SEVEN64) - pool->tracking.allocations[index];
 										}
 									}
 									if(thisPoolInUse == 0) {
@@ -3353,14 +3353,14 @@ static void print_current_usage() {
 			arenas[0]->profile.mallocCount,
 			arenas[0]->profile.reallocCount,
 			currentOSReported,
-			arenas[0]->profile.currentOSBytesMapped, 
+			arenas[0]->profile.currentOSBytesMapped,
 			arenas[0]->profile.currentBytesAllocated,
 			poolMetadata,
 			smallPageWaste,
 			smallFreeOnInUsePage,
-			pendingReleasePages * PAGE_SIZE, 
+			pendingReleasePages * PAGE_SIZE,
 			pendingReleaseLargeBytes,
-			(unassignedPages + tcachePages) * PAGE_SIZE, 
+			(unassignedPages + tcachePages) * PAGE_SIZE,
 			unassignedLargeBytes,
 			largePoolAssigned,
 			smallPoolCount, largePoolCount, jumboPoolCount,
