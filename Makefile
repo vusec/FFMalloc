@@ -91,6 +91,11 @@ $(OBJ_DIR) $(LIB_DIR):
 
 $(SRCS): $(HDRS)
 
+.PHONY: install_st
+install_st: sharedst
+	mkdir -p $(INSTALL_TARGET)
+	install -m 557 $(LIB_SHARED_ST) $(INSTALL_TARGET)
+
 clean:
 	rm -rf $(LIB_DIR)
 	rm -rf $(OBJ_DIR)
