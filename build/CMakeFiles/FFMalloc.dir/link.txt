@@ -1,0 +1,1 @@
+/home/ubuntu/llvm/ninja-build/bin/clang -fPIC -g -fuse-ld=lld -shared -shared -Wl,-soname,libFFMalloc.so -o libFFMalloc.so CMakeFiles/FFMalloc.dir/src/ffmalloc.c.o 
