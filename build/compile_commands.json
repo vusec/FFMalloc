@@ -1,7 +1,0 @@
-[
-{
-  "directory": "/home/ubuntu/Johannes/external/FFMalloc/build",
-  "command": "/home/ubuntu/llvm/ninja-build/bin/clang -DFFMalloc_EXPORTS -I/home/ubuntu/Johannes/external/FFMalloc/src  -g -fPIC   -Wall -fdiagnostics-color=always -c -g -O3 -fPIC -Wextra -Wno-reorder -D_GNU_SOURCE -Wno-unknown-pragmas -DFF_GROWLARGEREALLOC -Wno-unused-parameter -Wno-overloaded-virtual -Wno-ignored-qualifiers -o CMakeFiles/FFMalloc.dir/src/ffmalloc.c.o   -c /home/ubuntu/Johannes/external/FFMalloc/src/ffmalloc.c",
-  "file": "/home/ubuntu/Johannes/external/FFMalloc/src/ffmalloc.c"
-}
-]
