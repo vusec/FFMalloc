@@ -20,7 +20,7 @@ OBJ_SHARED_NPMT := $(patsubst $(LIB_DIR)/%.so, $(OBJ_DIR)/%.o, $(LIB_SHARED_NPMT
 OBJ_SHARED_NPST := $(patsubst $(LIB_DIR)/%.so, $(OBJ_DIR)/%.o, $(LIB_SHARED_NPST))
 OBJ_SHARED_NPINST := $(patsubst $(LIB_DIR)/%.so, $(OBJ_DIR)/%.o, $(LIB_SHARED_NPINST))
 
-CFLAGS := -Wall -Wextra -Wno-unknown-pragmas -fPIC -c -g -O2 -DFF_GROWLARGEREALLOC -D_GNU_SOURCE
+CFLAGS := -Wall -Wextra -Wno-unknown-pragmas -fPIC -c -g -O3 -DFF_GROWLARGEREALLOC -D_GNU_SOURCE
 CC := gcc
 
 all: prefixed noprefix
