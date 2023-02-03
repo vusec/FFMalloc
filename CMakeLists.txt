@@ -1,57 +1,72 @@
 cmake_minimum_required(VERSION 3.16.3)
-project(FFMalloc C)
+project(FFMalloc)
 
 # =============================================================================
 # Global CMake core & compiler settings
 # =============================================================================
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
-set(CMAKE_VERBOSE_MAKEFILE on CACHE STRING "Verbose Makefiles")
-set(CMAKE_BUILD_TYPE Debug CACHE STRING "Debug Build Type" FORCE)
+set(LOG_LVL LVL_INFO CACHE STRING "Logging level for VeriPatch")
+set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type debug" FORCE)
 set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
-set(LOG_LEVEL "LOG_LEVEL_ERROR" CACHE STRING "Set the logging level")
-
-# Global Compiler flags
-add_compile_options("-Wall")
-add_compile_options("-fdiagnostics-color=always")
-
-# Set global linker options
-add_link_options("-fuse-ld=lld")
 
 # =============================================================================
 # KrmlLib definition
 # =============================================================================
 add_library(FFMalloc SHARED)
 target_sources(FFMalloc
-    PUBLIC src/ffmalloc.h
-    PRIVATE src/ffmalloc.c
+    PUBLIC
+        src/ffmalloc.h
+    PRIVATE
+        src/ffmalloc.c
 )
 
 # Specify target-specific compile options
-target_compile_options(FFMalloc
-    PRIVATE "-c"
-    PRIVATE "-g"
-    PRIVATE "-O3"
-    PRIVATE "-fPIC"
-    PRIVATE "-Wall"
-    PRIVATE "-Wextra"
-    PRIVATE "-Wno-reorder"
-    PRIVATE "-D_GNU_SOURCE"
-    PRIVATE "-Wno-unknown-pragmas"
-    PRIVATE "-DFF_GROWLARGEREALLOC"
-    PRIVATE "-Wno-unused-parameter"
-    PRIVATE "-Wno-overloaded-virtual"
-    PRIVATE "-Wno-ignored-qualifiers"
-    PRIVATE "-fdiagnostics-color=always"
+target_compile_definitions(FFMalloc
+    PRIVATE
+        -DFF_GROWLARGEREALLOC
+        -D_GNU_SOURCE
+        -DUSE_FF_PREFIX
+        -DFFSINGLE_THREADED
 )
-
-target_link_options(FFMalloc
-    PRIVATE "-shared"
+target_compile_options(FFMalloc
+    PRIVATE
+        -c
+        -g
+        -O2
+        -fPIC
+        -Wall
+        -Wextra
+        -Wno-reorder
+        -D_GNU_SOURCE
+        -Wno-unknown-pragmas
+        -DFF_GROWLARGEREALLOC
+        -Wno-unused-parameter
+        -Wno-overloaded-virtual
+        -Wno-ignored-qualifiers
+        -fdiagnostics-color=always
+)
+target_link_options(FFMalloc PRIVATE -fuse-ld=lld)
+target_compile_definitions(FFMalloc PRIVATE LOG_LVL=${LOG_LVL})
+target_compile_features(FFMalloc
+    PRIVATE
+        cxx_std_20
+        c_std_11
 )
 
 # Specify include file tree (publicly available)
-target_include_directories(FFMalloc PUBLIC "src")
+target_include_directories(FFMalloc PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src)
 
-# Install LLVMUtils
-install(TARGETS FFMalloc
-    ARCHIVE RUNTIME LIBRARY PUBLIC_HEADER PRIVATE_HEADER
+# Get and install into default installation dirs. Don't export headers, only compiled libs
+include(GNUInstallDirs)
+install(
+    TARGETS
+        FFMalloc
+    RUNTIME
+        DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PUBLIC_HEADER
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
