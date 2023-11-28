@@ -1,16 +1,5 @@
 cmake_minimum_required(VERSION 3.23)
 
-# Configure some high-level compiler options & settings
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
-set(CMAKE_COLOR_MAKEFILE ON)
-set(CMAKE_COLOR_DIAGNOSTICS ON)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-set(CMAKE_VERBOSE_MAKEFILE ON CACHE STRING "Toggle verbose Makefiles")
-set(CMAKE_BUILD_TYPE Debug CACHE STRING "Set the build type (default: debug)")
-
 # =============================================================================
 # Core project definition
 # =============================================================================
@@ -57,20 +46,18 @@ target_sources(FFMalloc
         FILES "${FFMalloc_SOURCE_DIR}/src/ffmalloc.h"
 )
 
+target_compile_options(FFMalloc PRIVATE "-Wno-unknown-pragmas")
+
 # Specify target-specific compile options
 target_compile_definitions(FFMalloc
     PRIVATE
-        -DFF_GROWLARGEREALLOC
-        -D_GNU_SOURCE
-        -DUSE_FF_PREFIX
-        -DFFSINGLE_THREADED
-)
-
-target_compile_definitions(FFMalloc PUBLIC "_BSD_SOURCE" "_DEFAULT_SOURCE")
-target_compile_options(FFMalloc PUBLIC -g -O3 -flto -fwrapv)
-target_compile_options(FFMalloc PRIVATE -Wall -Wextra -Wno-unknown-pragmas)
-target_compile_options(FFMalloc PUBLIC
-    $<IF:$<C_COMPILER_ID:GNU>,-fdiagnostics-color=always,$<$<C_COMPILER_ID:Clang>:-fcolor-diagnostics>>
+        FF_GROWLARGEREALLOC
+        _GNU_SOURCE
+        USE_FF_PREFIX
+        FFSINGLE_THREADED
+    PUBLIC
+        _BSD_SOURCE
+        _DEFAULT_SOURCE
 )
 
 # Get and install into default installation dirs. Don't export headers, only compiled libs
