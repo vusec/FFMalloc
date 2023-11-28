@@ -26,8 +26,8 @@ add_library(FFMalloc SHARED)
 
 set_target_properties(FFMalloc
     PROPERTIES
-        C_STANDARD 23
-        CXX_STANDARD 23
+        C_STANDARD 11
+        CXX_STANDARD 20
         C_EXTENSIONS ON
         CXX_EXTENSIONS ON
         C_STANDARD_REQUIRED ON
