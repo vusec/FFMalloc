@@ -68,7 +68,7 @@ target_compile_definitions(FFMalloc
 
 target_compile_definitions(FFMalloc PUBLIC "_BSD_SOURCE" "_DEFAULT_SOURCE")
 target_compile_options(FFMalloc PUBLIC -g -O3 -flto -fwrapv)
-target_compile_options(FFMalloc PRIVATE -Wall -Wextra -Wpedantic)
+target_compile_options(FFMalloc PRIVATE -Wall -Wextra -Wno-unknown-pragmas)
 target_compile_options(FFMalloc PUBLIC
     $<IF:$<C_COMPILER_ID:GNU>,-fdiagnostics-color=always,$<$<C_COMPILER_ID:Clang>:-fcolor-diagnostics>>
 )
